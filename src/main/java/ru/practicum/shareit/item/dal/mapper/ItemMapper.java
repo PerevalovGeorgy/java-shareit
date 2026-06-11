@@ -1,15 +1,14 @@
 package ru.practicum.shareit.item.dal.mapper;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-
-import javax.swing.tree.RowMapper;
 
 @Component
-public class ItemMapper {
-
+@RequiredArgsConstructor
+public class ItemMapper  {
 
     public ItemDto toItemDto(Item item) {
         if (item == null) {
@@ -35,8 +34,8 @@ public class ItemMapper {
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
-                .available(itemDto.isAvailable())
-                .ownerId(itemDto.getOwnerId())
+                .available(itemDto.getAvailable() != null && itemDto.getAvailable())
+                .ownerId(itemDto.getOwnerId() != null ? itemDto.getOwnerId() : 0)
                 .request(itemDto.getRequest())
                 .build();
     }

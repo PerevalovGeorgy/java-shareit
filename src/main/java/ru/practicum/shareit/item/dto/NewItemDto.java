@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ItemDto {
+public class NewItemDto {
     private long id;
 
     @NotBlank(message = "Название вещи не может быть пустым")
@@ -17,9 +17,11 @@ public class ItemDto {
     private String description;
 
     @NotNull(message = "Занятость вещи должена быть указана")
-    private Boolean available;
+    @Builder.Default
+    private boolean available = false;
 
-    private Long ownerId;
+    @NotBlank(message = "Владелец вещи должен быть указан")
+    private long ownerId;
 
     private String request;
 }
