@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.controller;
+package ru.practicum.shareit.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.UserService;
 
 @Slf4j
 @RestController

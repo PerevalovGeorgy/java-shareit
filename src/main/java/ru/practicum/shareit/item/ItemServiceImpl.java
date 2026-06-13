@@ -134,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
 
     private Item checkItemExists(long id) {
         Optional<Item> optionalItem = itemDao.findById(id);
-        if (!optionalItem.isPresent()) {
+        if (optionalItem.isEmpty()) {
             throw new NotFoundException("Вещь с id " + id + " не найдена");
         }
         return optionalItem.get();
