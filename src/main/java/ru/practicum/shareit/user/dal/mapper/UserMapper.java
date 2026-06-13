@@ -9,7 +9,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 @RequiredArgsConstructor
 public class UserMapper {
 
-    public UserDto toUserDto (User user) {
+    public UserDto toUserDto(User user) {
         if (user == null) {
             return null;
         }
