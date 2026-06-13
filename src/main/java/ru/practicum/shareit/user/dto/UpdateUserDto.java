@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class UpdateUserDto {
     private long id;
 
     @NotBlank(message = "Имя не может быть пустым")

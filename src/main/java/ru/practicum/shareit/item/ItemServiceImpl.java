@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.UserDao;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemDao itemDao;
-    private final UserDao userDao;  // понадобится для проверки существования пользователя
+    private final UserDao userDao;
     private final ItemMapper mapper;
 
     @Override
@@ -38,9 +39,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("Получение вещи с id: {} пользователем с id: {}", id, userId);
 
         checkUserExists(userId);
-
-        Item item = itemDao.findById(id)
-                .orElseThrow(() -> new NotFoundException("Вещь с id " + id + " не найдена"));
+        Item item = checkItemExists(id);
 
         return mapper.toItemDto(item);
     }
@@ -50,14 +49,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("Создание вещи пользователем с id: {}", userId);
 
         checkUserExists(userId);
-
-        // Валидация
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-            throw new ValidationException("Название вещи не может быть пустым");
-        }
+        validateName(itemDto);
 
         Item item = mapper.toEntity(itemDto);
-        item.setOwnerId(userId);  // владелец - это пользователь из заголовка
+        item.setOwnerId(userId);
 
         Item created = itemDao.create(item);
         return mapper.toItemDto(created);
@@ -69,29 +64,23 @@ public class ItemServiceImpl implements ItemService {
 
         checkUserExists(userId);
 
-        Item existingItem = itemDao.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+        Item existingItem = checkItemExists(itemId);
 
-        // Проверяем, что пользователь - владелец
-        if (existingItem.getOwnerId() != userId) {
-            throw new AccessDeniedException("Редактировать вещь может только владелец");
-        }
+        checkOwner(existingItem, userId);
 
-        // Обновляем только переданные поля
         if (itemDto.getName() != null) {
             existingItem.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
             existingItem.setDescription(itemDto.getDescription());
         }
-        if (itemDto.getAvailable() != null) {  // теперь работает, так как Boolean
+        if (itemDto.getAvailable() != null) {
             existingItem.setAvailable(itemDto.getAvailable());
         }
         if (itemDto.getRequest() != null) {
             existingItem.setRequest(itemDto.getRequest());
         }
 
-        // Сохраняем обновленную вещь
         Item updated = itemDao.update(existingItem);
         return mapper.toItemDto(updated);
     }
@@ -100,12 +89,11 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemDto> searchAvailable(String text) {
         log.info("Поиск доступных вещей по тексту: {}", text);
 
-        // Согласно ТЗ, если текст пустой, возвращаем пустой список
         if (text == null || text.isBlank()) {
-            return Collections.emptyList();  // Collections, не Collection
+            return Collections.emptyList();
         }
 
-        return itemDao.searchItems(text).stream()  // searchItems, а не searchAvailable
+        return itemDao.searchItems(text).stream()
                 .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -115,14 +103,8 @@ public class ItemServiceImpl implements ItemService {
         log.info("Удаление вещи с id: {} пользователем с id: {}", itemId, userId);
 
         checkUserExists(userId);
-
-        Item existingItem = itemDao.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
-
-        // Проверка прав: удалять может только владелец
-        if (existingItem.getOwnerId() != userId) {
-            throw new AccessDeniedException("Удалить вещь может только её владелец");
-        }
+        Item existingItem = checkItemExists(itemId);
+        checkOwnerToDelete(existingItem, userId);
 
         itemDao.delete(itemId);
     }
@@ -131,5 +113,30 @@ public class ItemServiceImpl implements ItemService {
         if (!userDao.existsById(userId)) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
+    }
+
+    private void checkOwner(Item existingItem, long userId) {
+        if (existingItem.getOwnerId() != userId) {
+            throw new AccessDeniedException("Редактировать вещь может только владелец");
+        }
+    }
+
+    private void checkOwnerToDelete(Item existingItem, long userId) {
+        if (existingItem.getOwnerId() != userId) {
+            throw new AccessDeniedException("Удалить вещь может только её владелец");
+        }
+    }
+    private void validateName(ItemDto itemDto) {
+        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
+            throw new ValidationException("Название вещи не может быть пустым");
+        }
+    }
+
+    private Item checkItemExists(long id) {
+        Optional<Item> optionalItem = itemDao.findById(id);
+        if (!optionalItem.isPresent()) {
+            throw new NotFoundException("Вещь с id " + id + " не найдена");
+        }
+        return optionalItem.get();
     }
 }

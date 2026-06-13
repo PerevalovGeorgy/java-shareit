@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import ru.practicum.shareit.item.dto.NewItemDto;
 
 import java.util.Collection;
 import java.util.Optional;

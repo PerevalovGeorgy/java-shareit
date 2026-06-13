@@ -14,6 +14,7 @@ public class ItemDto {
     @NotBlank(message = "Название вещи не может быть пустым")
     private String name;
 
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
     @NotNull(message = "Занятость вещи должена быть указана")

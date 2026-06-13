@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.dal.ItemRepository;
-import ru.practicum.shareit.item.dto.NewItemDto;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,13 +37,8 @@ public class InMemoryItemDao implements ItemDao {
     public Item create(Item item) {
         log.info("Создание новой вещи: {}", item);
 
-        // Валидация
-        if (item.getName() == null || item.getName().isBlank()) {
-            throw new ValidationException("Название вещи не может быть пустым");
-        }
-        if (item.getOwnerId() <= 0) {
-            throw new ValidationException("Владелец вещи должен быть указан");
-        }
+        checkName(item);
+        checkGetOwner(item);
 
         long newId = idGenerator.getAndIncrement();
         item.setId(newId);
@@ -60,24 +53,17 @@ public class InMemoryItemDao implements ItemDao {
     public Item update(Item updatedItem) {
         log.info("Обновление вещи: {}", updatedItem);
 
-        Item existingItem = items.get(updatedItem.getId());
-        if (existingItem == null) {
-            throw new NotFoundException("Вещь с id " + updatedItem.getId() + " не найдена");
-        }
+        Item existingItem = checkItemExists(updatedItem);
 
-        // Проверка прав: обновлять может только владелец
-        if (existingItem.getOwnerId() != updatedItem.getOwnerId()) {
-            throw new ValidationException("Редактировать вещь может только владелец");
-        }
+        checkOwner(existingItem, updatedItem);
 
-        // Обновляем только не-null поля
         if (updatedItem.getName() != null) {
             existingItem.setName(updatedItem.getName());
         }
         if (updatedItem.getDescription() != null) {
             existingItem.setDescription(updatedItem.getDescription());
         }
-        // available - примитив, поэтому проверяем через булевый флаг
+
         existingItem.setAvailable(updatedItem.isAvailable());
         if (updatedItem.getRequest() != null) {
             existingItem.setRequest(updatedItem.getRequest());
@@ -103,11 +89,6 @@ public class InMemoryItemDao implements ItemDao {
 
     @Override
     public Collection<Item> searchItems(String text) {
-        return List.of();
-    }
-
-
-    public Collection<Item> searchAvailable(String text) {
         log.info("Поиск доступных вещей по тексту: {}", text);
 
         if (text == null || text.isBlank()) {
@@ -117,11 +98,37 @@ public class InMemoryItemDao implements ItemDao {
         String lowerText = text.toLowerCase();
 
         return items.values().stream()
-                .filter(Item::isAvailable)  // только доступные
+                .filter(Item::isAvailable)
                 .filter(item ->
                         (item.getName() != null && item.getName().toLowerCase().contains(lowerText)) ||
                                 (item.getDescription() != null && item.getDescription().toLowerCase().contains(lowerText))
                 )
                 .collect(Collectors.toList());
+    }
+
+    private void checkName(Item item) {
+        if (item.getName() == null || item.getName().isBlank()) {
+            throw new ValidationException("Название вещи не может быть пустым");
+        }
+    }
+
+    private void checkGetOwner(Item item) {
+        if (item.getOwnerId() <= 0) {
+            throw new ValidationException("Владелец вещи должен быть указан");
+        }
+    }
+
+    private Item checkItemExists(Item  updatedItem) {
+        Item existingItem = items.get(updatedItem.getId());
+        if (existingItem == null) {
+            throw new NotFoundException("Вещь с id " + updatedItem.getId() + " не найдена");
+        }
+        return existingItem;
+    }
+
+    private void checkOwner(Item existingItem, Item updatedItem) {
+        if (existingItem.getOwnerId() != updatedItem.getOwnerId()) {
+            throw new ValidationException("Редактировать вещь может только владелец");
+        }
     }
 }
