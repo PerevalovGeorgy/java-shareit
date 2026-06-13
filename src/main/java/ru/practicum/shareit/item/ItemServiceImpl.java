@@ -126,6 +126,7 @@ public class ItemServiceImpl implements ItemService {
             throw new AccessDeniedException("Удалить вещь может только её владелец");
         }
     }
+
     private void validateName(ItemDto itemDto) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ValidationException("Название вещи не может быть пустым");
