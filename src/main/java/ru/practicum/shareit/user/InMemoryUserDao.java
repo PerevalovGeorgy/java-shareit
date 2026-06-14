@@ -47,7 +47,6 @@ public class InMemoryUserDao implements UserDao {
     @Override
     public User update(User user) {
         log.info("Изменение пользователя: {}", user);
-        checkExsistsUser(user.getId());
 
         users.put(user.getId(), user);
         return user;
@@ -57,15 +56,6 @@ public class InMemoryUserDao implements UserDao {
     @Override
     public void delete(long userId) {
         log.info("Удаление пользователя с id: {}", userId);
-        checkExsistsUser(userId);
-
         users.remove(userId);
     }
-
-    private void checkExsistsUser(long userId) {
-        if (!users.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
-        }
-    }
-
 }
