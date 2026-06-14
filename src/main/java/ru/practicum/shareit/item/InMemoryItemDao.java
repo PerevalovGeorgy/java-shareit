@@ -37,8 +37,8 @@ public class InMemoryItemDao implements ItemDao {
     public Item create(Item item) {
         log.info("Создание новой вещи: {}", item);
 
-        checkName(item);
-        checkGetOwner(item);
+//        checkName(item);
+//        checkGetOwner(item);
 
         long newId = idGenerator.getAndIncrement();
         item.setId(newId);
@@ -53,9 +53,9 @@ public class InMemoryItemDao implements ItemDao {
     public Item update(Item updatedItem) {
         log.info("Обновление вещи: {}", updatedItem);
 
-        Item existingItem = checkItemExists(updatedItem);
+        Item existingItem = items.get(updatedItem.getId());
 
-        checkOwner(existingItem, updatedItem);
+//        checkOwner(existingItem, updatedItem);
 
         if (updatedItem.getName() != null) {
             existingItem.setName(updatedItem.getName());
@@ -104,31 +104,5 @@ public class InMemoryItemDao implements ItemDao {
                                 (item.getDescription() != null && item.getDescription().toLowerCase().contains(lowerText))
                 )
                 .collect(Collectors.toList());
-    }
-
-    private void checkName(Item item) {
-        if (item.getName() == null || item.getName().isBlank()) {
-            throw new ValidationException("Название вещи не может быть пустым");
-        }
-    }
-
-    private void checkGetOwner(Item item) {
-        if (item.getOwnerId() <= 0) {
-            throw new ValidationException("Владелец вещи должен быть указан");
-        }
-    }
-
-    private Item checkItemExists(Item  updatedItem) {
-        Item existingItem = items.get(updatedItem.getId());
-        if (existingItem == null) {
-            throw new NotFoundException("Вещь с id " + updatedItem.getId() + " не найдена");
-        }
-        return existingItem;
-    }
-
-    private void checkOwner(Item existingItem, Item updatedItem) {
-        if (existingItem.getOwnerId() != updatedItem.getOwnerId()) {
-            throw new ValidationException("Редактировать вещь может только владелец");
-        }
     }
 }
