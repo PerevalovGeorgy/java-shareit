@@ -36,9 +36,6 @@ public class InMemoryItemDao implements ItemDao {
     public Item create(Item item) {
         log.info("Создание новой вещи: {}", item);
 
-//        checkName(item);
-//        checkGetOwner(item);
-
         long newId = idGenerator.getAndIncrement();
         item.setId(newId);
 
@@ -53,8 +50,6 @@ public class InMemoryItemDao implements ItemDao {
         log.info("Обновление вещи: {}", updatedItem);
 
         Item existingItem = items.get(updatedItem.getId());
-
-//        checkOwner(existingItem, updatedItem);
 
         if (updatedItem.getName() != null) {
             existingItem.setName(updatedItem.getName());
