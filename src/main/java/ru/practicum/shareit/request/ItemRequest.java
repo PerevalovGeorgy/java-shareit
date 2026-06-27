@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request;
 
+import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 
@@ -9,9 +11,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
+@Table(name = "item_requests")
 public class ItemRequest {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String description;
-    private long requestorId;
-    private LocalDateTime created;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requestor_id", nullable = false)
+    private User user;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }

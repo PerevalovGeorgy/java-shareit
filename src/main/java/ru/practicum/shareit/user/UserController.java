@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UpdateUserDto;
-import ru.practicum.shareit.user.dto.UserDto;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -42,5 +42,17 @@ public class UserController {
     public UserDto get(@PathVariable long userId) {
         log.info("GET /users/{} - получение пользователя", userId);
         return userService.get(userId);
+    }
+
+    @GetMapping
+    public List<UserDto> getAll() {
+        log.info("GET /users - получение всех пользователей");
+        return userService.getAll();
+    }
+
+    @GetMapping("/search")
+    public UserDto getByEmail(@RequestParam String email) {
+        log.info("GET /users/search?email={} - поиск пользователя по email", email);
+        return userService.getByEmail(email);
     }
 }

@@ -3,20 +3,21 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.dal.mapper.UserMapper;
-import ru.practicum.shareit.user.dto.UpdateUserDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    private final UserDao userDao;
+    private final UserRepository userRepository;
     private final UserMapper mapper;
 
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
@@ -30,18 +31,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getByEmail(String email) {
+        log.info("Поиск пользователя по email: {}", email);
+
+        validateEmail(email);
+
+        User user = userRepository.findUserByEmailIgnoreCase(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь с email " + email + " не найден"));
+
+        return mapper.toUserDto(user);
+    }
+
+    @Override
+    public List<UserDto> getAll () {
+        log.info("Получение всех пользователей");
+        return userRepository.findAll().stream()
+                .map(mapper::toUserDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         log.info("Создание пользователя: {}", userDto);
 
         validateEmail(userDto.getEmail());
-        checkUniqueEmail(userDto);
+        checkUniqueEmail(userDto.getEmail());
 
         User user = mapper.toEntity(userDto);
-        User created = userDao.create(user);
+        User created = userRepository.save(user);
+        log.info("Пользователь создан с id: {}", created.getId());
         return mapper.toUserDto(created);
     }
 
     @Override
+    @Transactional
     public UserDto update(long userId, UpdateUserDto updateUserDto) {
         log.info("Обновление пользователя: {}", userId);
 
@@ -54,23 +79,24 @@ public class UserServiceImpl implements UserService {
         if (updateUserDto.getEmail() != null && !updateUserDto.getEmail().isBlank()) {
             validateEmail(updateUserDto.getEmail());
 
-            if (!updateUserDto.getEmail().equals(existingUser.getEmail())) {
-                if (userDao.existsByEmail(updateUserDto.getEmail())) {
-                    throw new EmailAlreadyExistsException("Пользователь с email " + updateUserDto.getEmail() + " уже существует");
-                }
+            if (!updateUserDto.getEmail().equalsIgnoreCase(existingUser.getEmail())) {
+                checkUniqueEmail(updateUserDto.getEmail());
                 existingUser.setEmail(updateUserDto.getEmail());
             }
         }
 
-
-        User updated = userDao.update(existingUser);
+        User updated =  userRepository.save(existingUser);
+        log.info("Пользователь с id {} обновлен", userId);
         return mapper.toUserDto(updated);
     }
 
     @Override
+    @Transactional
     public void delete(long userId) {
         log.info("Удаление пользователя: {}", userId);
-        userDao.delete(userId);
+        User user = checkUserExists(userId);
+        userRepository.delete(user);
+        log.info("Пользователь с id = {} удален", userId);
     }
 
     @Override
@@ -84,14 +110,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void checkUniqueEmail(UserDto userDto) {
-        if (userDao.existsByEmail(userDto.getEmail())) {
-            throw new EmailAlreadyExistsException("Пользователь с email " + userDto.getEmail() + " уже существует");
+    private void checkUniqueEmail(String email) {
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new EmailAlreadyExistsException("Пользователь с email " + email + " уже существует");
         }
     }
 
-    public  User checkUserExists(long userId) {
-        Optional<User> userOptional = userDao.findById(userId);
+    public User checkUserExists(long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");

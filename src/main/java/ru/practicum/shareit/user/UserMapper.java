@@ -1,9 +1,7 @@
-package ru.practicum.shareit.user.dal.mapper;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
 
 @Component
 @RequiredArgsConstructor
@@ -30,5 +28,19 @@ public class UserMapper {
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
+    }
+
+    public void updateUserFromDto(UserDto userDto, User user) {
+        if (userDto == null || user == null) {
+            return;
+        }
+
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
     }
 }

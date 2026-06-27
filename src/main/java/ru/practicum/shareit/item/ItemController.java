@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
 
@@ -64,5 +63,15 @@ public class ItemController {
             @PathVariable long itemId) {
         log.info("DELETE /items/{} - удаление вещи, userId={}", itemId, userId);
         itemService.delete(userId, itemId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addComment(
+            @RequestHeader(REQUESTHEADER) long userId,
+            @PathVariable long itemId,
+            @Valid @RequestBody CommentDto commentDto) {
+        log.info("POST /items/{}/comment - добавление комментария к вещи, userId={}", itemId, userId);
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }
