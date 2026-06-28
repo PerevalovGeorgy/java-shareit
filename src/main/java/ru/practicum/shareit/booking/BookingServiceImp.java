@@ -67,8 +67,8 @@ public class BookingServiceImp implements BookingService {
     public BookingResponseDto approve(Long userId, Long bookingId, Boolean approved) {
         log.info("Подтверждение бронирования {} пользователем {}, approved={}", bookingId, userId, approved);
 
-        checkUserExists(userId);
         Booking booking = checkBookingExists(bookingId);
+        Long ownerId = booking.getItem().getOwner().getId();
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new AccessDeniedException("Подтвердить бронирование может только владелец");
