@@ -43,13 +43,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAll () {
+    public List<UserDto> getAll() {
         log.info("Получение всех пользователей");
         return userRepository.findAll().stream()
                 .map(mapper::toUserDto)
                 .collect(Collectors.toList());
     }
-
 
     @Override
     @Transactional
