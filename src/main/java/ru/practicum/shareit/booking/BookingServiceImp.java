@@ -25,10 +25,6 @@ public class BookingServiceImp implements BookingService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
 
-    private final BookingMapper bookingMapper;
-
-
-
     @Override
     @Transactional
     public BookingResponseDto create(Long userId, BookingRequestDto bookingRequestDto) {
@@ -42,7 +38,7 @@ public class BookingServiceImp implements BookingService {
         }
 
         if (!item.isAvailable()) {
-            throw new ValidationException("Вещь недоступна для бронирования");
+            throw new BadRequestException("Вещь недоступна для бронирования");
         }
 
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd()) ||
@@ -52,14 +48,14 @@ public class BookingServiceImp implements BookingService {
 
         if (bookingRepository.existsOverlappingBooking(
                 item.getId(), bookingRequestDto.getStart(), bookingRequestDto.getEnd())) {
-            throw new ValidationException("Вещь уже забронирована на указанные даты");
+            throw new BadRequestException("Вещь уже забронирована на указанные даты");
         }
 
-        Booking booking = bookingMapper.toEntity(bookingRequestDto, item, booker);
+        Booking booking = BookingMapper.toEntity(bookingRequestDto, item, booker);
         Booking created = bookingRepository.save(booking);
         log.info("Успешно добавление бронирования вещи: {}, пользователем: {}", bookingRequestDto, userId);
 
-        return bookingMapper.toResponseDto(created);
+        return BookingMapper.toResponseDto(created);
     }
 
     @Override
@@ -87,7 +83,7 @@ public class BookingServiceImp implements BookingService {
         Booking updateBooking = bookingRepository.save(booking);
         log.info("Бронирование {} обновлено. Статус: {}", bookingId, updateBooking.getStatus());
 
-        return bookingMapper.toResponseDto(updateBooking);
+        return BookingMapper.toResponseDto(updateBooking);
     }
 
     @Override
@@ -103,7 +99,7 @@ public class BookingServiceImp implements BookingService {
             throw new AccessDeniedException("Пользователь не имеет доступа к этому бронированию");
         }
 
-        return bookingMapper.toResponseDto(booking);
+        return BookingMapper.toResponseDto(booking);
     }
 
     @Override
@@ -111,7 +107,7 @@ public class BookingServiceImp implements BookingService {
         log.info("Получение данных о забронированных вещая в статусе {}  пользователем {} ", status, userId);
 
         checkUserExists(userId);
-        Status stateEnum = parseStatus(status);
+        Status stateEnum = Status.parse(status);
         List<Booking> bookings;
 
         switch (stateEnum) {
@@ -135,7 +131,7 @@ public class BookingServiceImp implements BookingService {
         }
 
         return bookings.stream()
-                .map(bookingMapper::toResponseDto)
+                .map(BookingMapper::toResponseDto)
                 .toList();
     }
 
@@ -150,7 +146,7 @@ public class BookingServiceImp implements BookingService {
             throw new BadRequestException("у пользователя нет вещей");
         }
 
-        Status stateEnum = parseStatus(status);
+        Status stateEnum = Status.parse(status);
         List<Booking> bookings;
 
         switch (stateEnum) {
@@ -174,21 +170,11 @@ public class BookingServiceImp implements BookingService {
         }
 
         return bookings.stream()
-                .map(bookingMapper::toResponseDto)
+                .map(BookingMapper::toResponseDto)
                 .collect(Collectors.toList());
 
     }
 
-    private Status parseStatus(String state) {
-        if (state == null) {
-            return Status.ALL;
-        }
-        try {
-            return Status.valueOf(state.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Unknown state: " + state);
-        }
-    }
 
     private Booking checkBookingExists(Long bookingId) {
         return bookingRepository.findById(bookingId)

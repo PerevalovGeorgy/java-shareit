@@ -1,19 +1,13 @@
 package ru.practicum.shareit.booking;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 
-@Component
-@RequiredArgsConstructor
 public class BookingMapper {
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
 
-    public Booking toEntity(BookingRequestDto bookingRequestDto, Item item, User booker) {
+    public static Booking toEntity(BookingRequestDto bookingRequestDto, Item item, User booker) {
         if (bookingRequestDto == null) {
             return null;
         }
@@ -27,7 +21,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public BookingResponseDto toResponseDto(Booking booking) {
+    public static BookingResponseDto toResponseDto(Booking booking) {
         if (booking == null) {
             return null;
         }
@@ -37,13 +31,13 @@ public class BookingMapper {
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .status(booking.getStatus())
-                .booker(userMapper.toUserDto(booking.getBooker()))
-                .item(itemMapper.toItemDto(booking.getItem()))
+                .booker(UserMapper.toUserDto(booking.getBooker()))
+                .item(ItemMapper.toItemDto(booking.getItem()))
                 .build();
     }
 
 
-    public BookingRequestDto toRequestDto(Booking booking) {
+    public static BookingRequestDto toRequestDto(Booking booking) {
         if (booking == null) {
             return null;
         }
@@ -55,7 +49,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public BookingShortDto toShortDto(Booking booking) {
+    public static BookingShortDto toShortDto(Booking booking) {
         if (booking == null) {
             return null;
         }

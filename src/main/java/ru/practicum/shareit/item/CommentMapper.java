@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -8,10 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+
 public class CommentMapper {
 
-    public CommentDto toCommentDto(Comment comment) {
+    public static CommentDto toCommentDto(Comment comment) {
         if (comment == null) {
             return null;
         }
@@ -24,16 +23,16 @@ public class CommentMapper {
                 .build();
     }
 
-    public List<CommentDto> toCommentDtoList(List<Comment> comments) {
+    public static List<CommentDto> toCommentDtoList(List<Comment> comments) {
         if (comments == null) {
             return Collections.emptyList();
         }
         return comments.stream()
-                .map(this::toCommentDto)
+                .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
 
-    public Comment toEntity(CommentDto commentDto, Item item, User author) {
+    public static Comment toEntity(CommentDto commentDto, Item item, User author) {
         if (commentDto == null) {
             return null;
         }
@@ -43,6 +42,19 @@ public class CommentMapper {
                 .item(item)
                 .user(author)
                 .created(commentDto.getCreated() != null ? commentDto.getCreated() : LocalDateTime.now())
+                .build();
+    }
+
+    public static Comment toEntityFromCommentTextDto(CommentTextDto commentTextDto, Item item, User author, LocalDateTime time) {
+        if (commentTextDto == null) {
+            return null;
+        }
+
+        return Comment.builder()
+                .text(commentTextDto.getText())
+                .item(item)
+                .user(author)
+                .created(time)
                 .build();
     }
 }

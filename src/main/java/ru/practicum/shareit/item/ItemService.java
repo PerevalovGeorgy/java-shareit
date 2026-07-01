@@ -16,5 +16,5 @@ public interface ItemService {
 
     void delete(long userId, long itemId);
 
-    CommentDto addComment(long userId, long itemId, CommentDto commentDto);
+    CommentDto addComment(long userId, long itemId, CommentTextDto commentTextDto);
 }

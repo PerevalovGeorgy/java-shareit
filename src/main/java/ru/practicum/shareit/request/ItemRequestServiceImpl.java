@@ -20,7 +20,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
-    private final ItemRequestMapper itemRequestMapper;
 
     @Override
     @Transactional
@@ -33,11 +32,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ValidationException("Описание запроса не может быть пустым");
         }
 
-        ItemRequest itemRequest = itemRequestMapper.toEntity(itemRequestDto, user);
+        ItemRequest itemRequest = ItemRequestMapper.toEntity(itemRequestDto, user);
         ItemRequest savedRequest = itemRequestRepository.save(itemRequest);
 
         log.info("Запрос на вещь создан с id: {}", savedRequest.getId());
-        return itemRequestMapper.toDto(savedRequest);
+        return ItemRequestMapper.toDto(savedRequest);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUserExists(userId);
 
         return itemRequestRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(itemRequestMapper::toDto)
+                .map(ItemRequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUserExists(userId);
 
         return itemRequestRepository.findAllByUserIdNotOrderByCreatedAtDesc(userId).stream()
-                .map(itemRequestMapper::toDto)
+                .map(ItemRequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkUserExists(userId);
         ItemRequest itemRequest = checkRequestExists(requestId);
 
-        return itemRequestMapper.toDto(itemRequest);
+        return ItemRequestMapper.toDto(itemRequest);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         log.info("Получение всех запросов");
 
         return itemRequestRepository.findAllOrderByCreatedAtDesc().stream()
-                .map(itemRequestMapper::toDto)
+                .map(ItemRequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 

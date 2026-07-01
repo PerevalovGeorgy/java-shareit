@@ -70,8 +70,8 @@ public class ItemController {
     public CommentDto addComment(
             @RequestHeader(REQUESTHEADER) long userId,
             @PathVariable long itemId,
-            @Valid @RequestBody CommentDto commentDto) {
+            @Valid @RequestBody CommentTextDto commentTextDto) {
         log.info("POST /items/{}/comment - добавление комментария к вещи, userId={}", itemId, userId);
-        return itemService.addComment(userId, itemId, commentDto);
+        return itemService.addComment(userId, itemId, commentTextDto);
     }
 }

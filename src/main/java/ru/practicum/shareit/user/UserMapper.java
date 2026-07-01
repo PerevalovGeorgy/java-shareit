@@ -1,13 +1,8 @@
 package ru.practicum.shareit.user;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-@Component
-@RequiredArgsConstructor
 public class UserMapper {
 
-    public UserDto toUserDto(User user) {
+    public static UserDto toUserDto(User user) {
         if (user == null) {
             return null;
         }
@@ -18,7 +13,7 @@ public class UserMapper {
                 .build();
     }
 
-    public User toEntity(UserDto userDto) {
+    public static User toEntity(UserDto userDto) {
         if (userDto == null) {
             return null;
         }
@@ -30,7 +25,7 @@ public class UserMapper {
                 .build();
     }
 
-    public void updateUserFromDto(UserDto userDto, User user) {
+    public static void updateUserFromDto(UserDto userDto, User user) {
         if (userDto == null || user == null) {
             return;
         }

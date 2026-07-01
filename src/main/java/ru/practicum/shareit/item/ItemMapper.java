@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.Booking;
-import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
@@ -10,18 +8,9 @@ import ru.practicum.shareit.user.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class ItemMapper {
 
-    private final BookingMapper bookingMapper;
-    private final CommentMapper commentMapper;
-
-    public ItemMapper(@Lazy BookingMapper bookingMapper, CommentMapper commentMapper) {
-        this.bookingMapper = bookingMapper;
-        this.commentMapper = commentMapper;
-    }
-
-    public ItemDto toItemDto(Item item) {
+    public static ItemDto toItemDto(Item item) {
         if (item == null) {
             return null;
         }
@@ -36,7 +25,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDto toItemDtoWithBookings(Item item, Booking lastBooking, Booking nextBooking, List<Comment> comments) {
+    public static ItemDto toItemDtoWithBookings(Item item, Booking lastBooking, Booking nextBooking, List<Comment> comments) {
         if (item == null) {
             return null;
         }
@@ -50,23 +39,23 @@ public class ItemMapper {
                 .requestId(item.getRequest() != null ? item.getRequest().getId() : null);
 
         if (lastBooking != null) {
-            builder.lastBooking(bookingMapper.toShortDto(lastBooking));
+            builder.lastBooking(BookingMapper.toShortDto(lastBooking));
         }
 
         if (nextBooking != null) {
-            builder.nextBooking(bookingMapper.toShortDto(nextBooking));
+            builder.nextBooking(BookingMapper.toShortDto(nextBooking));
         }
 
         if (comments != null && !comments.isEmpty()) {
             builder.comments(comments.stream()
-                    .map(commentMapper::toCommentDto)
+                    .map(CommentMapper::toCommentDto)
                     .collect(Collectors.toList()));
         }
 
         return builder.build();
     }
 
-    public Item toEntity(ItemDto itemDto, User owner, ItemRequest request) {
+    public static Item toEntity(ItemDto itemDto, User owner, ItemRequest request) {
         if (itemDto == null) {
             return null;
         }
@@ -81,7 +70,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public void updateItemFromDto(ItemDto itemDto, Item item) {
+    public static void updateItemFromDto(ItemDto itemDto, Item item) {
         if (itemDto == null || item == null) {
             return;
         }
@@ -99,7 +88,7 @@ public class ItemMapper {
         }
     }
 
-    public CommentDto toCommentDto(Comment comment) {
+    public static CommentDto toCommentDto(Comment comment) {
         if (comment == null) {
             return null;
         }

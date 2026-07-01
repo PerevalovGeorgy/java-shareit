@@ -1,19 +1,12 @@
 package ru.practicum.shareit.request;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserMapper;
 
 import java.time.LocalDateTime;
 
-@Component
-@RequiredArgsConstructor
 public class ItemRequestMapper {
 
-    private final UserMapper userMapper;
-
-    public ItemRequest toEntity(ItemRequestDto dto, User user) {
+    public static ItemRequest toEntity(ItemRequestDto dto, User user) {
         if (dto == null) {
             return null;
         }
@@ -25,7 +18,7 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public ItemRequestDto toDto(ItemRequest itemRequest) {
+    public static ItemRequestDto toDto(ItemRequest itemRequest) {
         if (itemRequest == null) {
             return null;
         }

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserMapper mapper;
 
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
@@ -27,7 +26,7 @@ public class UserServiceImpl implements UserService {
         log.info("Запрос пользователя с id: {}", userId);
         User existingUser = checkUserExists(userId);
 
-        return mapper.toUserDto(existingUser);
+        return UserMapper.toUserDto(existingUser);
     }
 
     @Override
@@ -39,14 +38,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserByEmailIgnoreCase(email)
                 .orElseThrow(() -> new NotFoundException("Пользователь с email " + email + " не найден"));
 
-        return mapper.toUserDto(user);
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public List<UserDto> getAll() {
         log.info("Получение всех пользователей");
         return userRepository.findAll().stream()
-                .map(mapper::toUserDto)
+                .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
@@ -58,10 +57,10 @@ public class UserServiceImpl implements UserService {
         validateEmail(userDto.getEmail());
         checkUniqueEmail(userDto.getEmail());
 
-        User user = mapper.toEntity(userDto);
+        User user = UserMapper.toEntity(userDto);
         User created = userRepository.save(user);
         log.info("Пользователь создан с id: {}", created.getId());
-        return mapper.toUserDto(created);
+        return UserMapper.toUserDto(created);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
         User updated =  userRepository.save(existingUser);
         log.info("Пользователь с id {} обновлен", userId);
-        return mapper.toUserDto(updated);
+        return UserMapper.toUserDto(updated);
     }
 
     @Override
