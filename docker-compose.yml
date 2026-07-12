@@ -1,17 +1,62 @@
-version: '3.8'
-
 services:
-  postgres:
-    image: postgres:15-alpine # или ваша версия
-    container_name: postgres_shareit
+  # ===== База данных PostgreSQL =====
+  db:
+    image: postgres:15
+    container_name: shareit-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: shareit
       POSTGRES_USER: dbuser
       POSTGRES_PASSWORD: 12345
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./shareit-server/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shareit-network
+
+  # ===== Server =====
+  server:
+    build:
+      context: .
+      dockerfile: ./shareit-server/Dockerfile
+    container_name: shareit-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/shareit
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - shareit-network
+
+  # ===== Gateway =====
+  gateway:
+    build:
+      context: .
+      dockerfile: ./shareit-gateway/Dockerfile
+    container_name: shareit-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      SHAREIT_SERVER_URL: http://server:9090
+    networks:
+      - shareit-network
+
+networks:
+  shareit-network:
+    driver: bridge
 
 volumes:
-  pgdata:
+  postgres_data:
