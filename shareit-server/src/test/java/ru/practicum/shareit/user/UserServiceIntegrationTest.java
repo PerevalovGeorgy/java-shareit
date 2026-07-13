@@ -7,13 +7,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import ru.practicum.shareit.ShareItServer;
+import ru.practicum.shareit.ShareitServer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@ContextConfiguration(classes = {ShareItServer.class, UserRepository.class, UserServiceImpl.class})
+@ContextConfiguration(classes = {ShareitServer.class, UserRepository.class, UserServiceImpl.class})
 class UserServiceIntegrationTest {
 
     @Autowired

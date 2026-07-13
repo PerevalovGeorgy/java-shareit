@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.ShareItServer;
+import ru.practicum.shareit.ShareitServer;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @ContextConfiguration(classes = {
-        ShareItServer.class,
+        ShareitServer.class,
         ItemRequestRepository.class,
         ItemRequestServiceImpl.class,
         UserRepository.class})

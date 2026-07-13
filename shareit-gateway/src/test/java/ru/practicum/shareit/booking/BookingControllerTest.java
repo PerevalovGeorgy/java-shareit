@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.ShareItGateway;
+import ru.practicum.shareit.ShareitGateway;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -23,9 +23,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = ShareItGateway.class)
+@SpringBootTest(classes = ShareitGateway.class)
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = {ShareItGateway.class})
+@ContextConfiguration(classes = {ShareitGateway.class})
 class BookingControllerTest {
 
     @Autowired
