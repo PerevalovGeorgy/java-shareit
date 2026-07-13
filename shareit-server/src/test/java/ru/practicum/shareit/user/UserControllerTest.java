@@ -12,7 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.user.*;
 
 import java.util.Arrays;
 import java.util.List;

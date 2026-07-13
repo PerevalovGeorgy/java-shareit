@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.ShareItGateway;
-import ru.practicum.shareit.user.*;
 
 import java.util.Arrays;
 import java.util.List;

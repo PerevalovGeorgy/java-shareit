@@ -12,7 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

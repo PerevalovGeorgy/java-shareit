@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import ru.practicum.shareit.ShareItServer;
-import ru.practicum.shareit.user.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
