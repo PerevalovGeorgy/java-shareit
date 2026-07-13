@@ -1,4 +1,4 @@
-package booking;
+package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

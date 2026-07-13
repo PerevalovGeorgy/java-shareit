@@ -1,4 +1,4 @@
-package request;
+package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.request.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

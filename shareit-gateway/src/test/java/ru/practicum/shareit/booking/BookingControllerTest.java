@@ -1,4 +1,4 @@
-package booking;
+package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.ShareItGateway;
-import ru.practicum.shareit.booking.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

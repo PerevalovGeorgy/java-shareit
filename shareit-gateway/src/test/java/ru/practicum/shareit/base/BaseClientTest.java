@@ -1,4 +1,4 @@
-package base;
+package ru.practicum.shareit.base;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
