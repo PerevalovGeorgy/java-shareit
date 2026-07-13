@@ -1,5 +1,4 @@
 services:
-  # ===== База данных PostgreSQL =====
   db:
     image: postgres:15
     container_name: shareit-db
@@ -20,7 +19,6 @@ services:
     networks:
       - shareit-network
 
-  # ===== Server =====
   server:
     build:
       context: .
@@ -39,7 +37,6 @@ services:
     networks:
       - shareit-network
 
-  # ===== Gateway =====
   gateway:
     build:
       context: .

@@ -3,8 +3,6 @@ package ru.practicum.shareit.client;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class BaseClient {
     protected final RestTemplate rest;
@@ -15,19 +13,19 @@ public class BaseClient {
         this.rest = rest;
     }
 
-    protected <T> ResponseEntity<T> get(String path, Long userId, Class<T> responseType, Object... params) {
+    public <T> ResponseEntity<T> get(String path, Long userId, Class<T> responseType, Object... params) {
         return makeRequest(HttpMethod.GET, path, userId, null, responseType, params);
     }
 
-    protected <T> ResponseEntity<T> post(String path, Long userId, Object body, Class<T> responseType, Object... params) {
+    public <T> ResponseEntity<T> post(String path, Long userId, Object body, Class<T> responseType, Object... params) {
         return makeRequest(HttpMethod.POST, path, userId, body, responseType, params);
     }
 
-    protected <T> ResponseEntity<T> patch(String path, Long userId, Object body, Class<T> responseType, Object... params) {
+    public <T> ResponseEntity<T> patch(String path, Long userId, Object body, Class<T> responseType, Object... params) {
         return makeRequest(HttpMethod.PATCH, path, userId, body, responseType, params);
     }
 
-    protected <T> ResponseEntity<T> delete(String path, Long userId, Class<T> responseType, Object... params) {
+    public <T> ResponseEntity<T> delete(String path, Long userId, Class<T> responseType, Object... params) {
         return makeRequest(HttpMethod.DELETE, path, userId, null, responseType, params);
     }
 

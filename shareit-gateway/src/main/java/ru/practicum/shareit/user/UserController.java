@@ -19,9 +19,11 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object>  create(@Valid @RequestBody UserDto userDto) {
-        log.info("POST /users - создание пользователя");
-        return userClient.create(userDto);
+    public ResponseEntity<Object> create(@Valid @RequestBody UserDto userDto) {
+        log.info("POST /users - создание пользователя: {}", userDto);
+        ResponseEntity<Object> response = userClient.create(userDto);
+        log.info("Response from client: {}", response);
+        return response;
     }
 
     @PatchMapping("/{userId}")
