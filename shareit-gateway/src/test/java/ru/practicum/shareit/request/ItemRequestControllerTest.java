@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = ShareItGateway.class)
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = {ShareItGateway.class})
 class ItemRequestControllerTest {
 
     @Autowired
