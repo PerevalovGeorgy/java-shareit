@@ -3,6 +3,9 @@ package ru.practicum.shareit.client;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BaseClient {
     protected final RestTemplate rest;
     protected final String serverUrl;
@@ -30,7 +33,7 @@ public class BaseClient {
 
     private <T> ResponseEntity<T> makeRequest(HttpMethod method, String path, Long userId,
                                               Object body, Class<T> responseType, Object... params) {
-        String url = serverUrl + String.format(path, params);
+        String url = serverUrl + path;
 
         HttpHeaders headers = new HttpHeaders();
         if (userId != null) {

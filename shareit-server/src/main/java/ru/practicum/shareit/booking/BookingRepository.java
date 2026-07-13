@@ -103,6 +103,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Queryds
                                      @Param("start") LocalDateTime start,
                                      @Param("end") LocalDateTime end);
 
+    @Query("SELECT COUNT(b) > 0 FROM Booking b " +
+            "WHERE b.booker.id = :userId " +
+            "AND b.item.id = :itemId " +
+            "AND b.status = :status " +
+            "AND b.end < :now")
+    boolean existsByBookerIdAndItemIdAndStatusAndEndBefore(
+            @Param("userId") long userId,
+            @Param("itemId") long itemId,
+            @Param("status") Status status,
+            @Param("now") LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.id = :itemId " +
@@ -135,4 +145,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Queryds
             "AND b.status = 'APPROVED' " +
             "ORDER BY b.item.id, b.start DESC")
     List<Booking> findAllApprovedBookingsByItemIds(@Param("itemIds") List<Long> itemIds);
+
+    boolean existsByBookerIdAndItemIdAndStatus(long bookerId, long itemId, Status status);
+
+    Optional<Booking> findFirstByBookerIdAndItemIdAndStatusOrderByEndDesc(long bookerId, long itemId, Status status);
 }

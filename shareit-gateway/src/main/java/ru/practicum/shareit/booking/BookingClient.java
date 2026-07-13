@@ -18,18 +18,18 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(long userId, long bookingId, boolean approved) {
-        return patch("/bookings/{bookingId}?approved={approved}", userId, null, Object.class, bookingId, approved);
+        return patch("/bookings/" + bookingId + "?approved=" + approved, userId, null, Object.class, bookingId, approved);
     }
 
     public ResponseEntity<Object> findById(long userId, long bookingId) {
-        return get("/bookings/{bookingId}", userId, Object.class, bookingId);
+        return get("/bookings/" + bookingId, userId, Object.class, bookingId);
     }
 
     public ResponseEntity<Object> findAllByUser(long userId, String state, Integer from, Integer size) {
-        return get("/bookings?state={state}&from={from}&size={size}", userId, Object.class, state, from, size);
+        return get("/bookings?state=" + state + "&from=" + from + "&size=" + size, userId, Object.class, state, from, size);
     }
 
     public ResponseEntity<Object> findAllByOwner(long userId, String state, Integer from, Integer size) {
-        return get("/bookings/owner?state={state}&from={from}&size={size}", userId, Object.class, state, from, size);
+        return get("/bookings/owner?state=" + state + "&from=" + from + "&size=" + size, userId, Object.class, state, from, size);
     }
 }

@@ -20,7 +20,7 @@ public class ItemRequestDto {
 
     private Long requestorId;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime created;
 
     private String requestorName;
 

@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     item_id BIGINT NOT NULL,
     booker_id BIGINT NOT NULL,
     status VARCHAR(50) DEFAULT 'WAITING' CHECK (status IN ('WAITING', 'APPROVED', 'REJECTED', 'CANCELED')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
     FOREIGN KEY (booker_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT check_booking_dates CHECK (start_time < end_time)

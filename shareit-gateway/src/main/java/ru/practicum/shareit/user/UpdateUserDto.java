@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateUserDto {
 
-    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 
     @Email(message = "Email должен быть в формате user@yandex.ru")

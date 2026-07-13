@@ -5,6 +5,8 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 
+import java.time.LocalDateTime;
+
 public class BookingMapper {
 
     public static Booking toEntity(BookingRequestDto bookingRequestDto, Item item, User booker) {
@@ -18,6 +20,7 @@ public class BookingMapper {
                 .item(item)
                 .booker(booker)
                 .status(Status.WAITING)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
@@ -33,6 +36,7 @@ public class BookingMapper {
                 .status(booking.getStatus())
                 .booker(UserMapper.toUserDto(booking.getBooker()))
                 .item(ItemMapper.toItemDto(booking.getItem()))
+                .createdAt(booking.getCreatedAt())
                 .build();
     }
 

@@ -26,4 +26,6 @@ public class BookingResponseDto {
     private UserDto booker;
 
     private ItemDto item;
+
+    private LocalDateTime createdAt;
 }

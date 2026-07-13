@@ -18,11 +18,11 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(long userId, long itemId, ItemDto itemDto) {
-        return patch("/items/{itemId}", userId, itemDto, Object.class, itemId);
+        return patch("/items/" + itemId, userId, itemDto, Object.class, itemId);
     }
 
     public ResponseEntity<Object> findById(long userId, long itemId) {
-        return get("/items/{itemId}", userId, Object.class, itemId);
+        return get("/items/" + itemId, userId, Object.class, itemId);
     }
 
     public ResponseEntity<Object> findAllByOwner(long userId) {
@@ -34,10 +34,10 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> delete(long userId, long itemId) {
-        return delete("/items/{itemId}", userId, Object.class, itemId);
+        return delete("/items/" + itemId, userId, Object.class, itemId);
     }
 
     public ResponseEntity<Object> addComment(long userId, long itemId, CommentTextDto commentTextDto) {
-        return post("/items/{itemId}/comment", userId, commentTextDto, Object.class, itemId);
+        return post("/items/" + itemId+ "/comment", userId, commentTextDto, Object.class, itemId);
     }
 }

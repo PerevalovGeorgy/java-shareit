@@ -44,7 +44,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         User user = checkUserExists(userId);
 
-        List<ItemRequest> requests = itemRequestRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+        List<ItemRequest> requests = itemRequestRepository.findAllByUserIdOrderByCreatedDesc(userId);
         List<ItemRequestDto> result = ItemRequestMapper.toDtoWithItemsList(requests);
 
         log.info("Найдено {} запросов для пользователя {}", result.size(), userId);
@@ -56,7 +56,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         log.info("Получение всех запросов других пользователей, кроме {}", userId);
 
         checkUserExists(userId);
-        List<ItemRequest> requests = itemRequestRepository.findAllByUserIdNotOrderByCreatedAtDesc(userId);
+        List<ItemRequest> requests = itemRequestRepository.findAllByUserIdNotOrderByCreatedDesc(userId);
 
         return ItemRequestMapper.toDtoWithItemsList(requests);
     }
@@ -75,7 +75,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAll() {
         log.info("Получение всех запросов");
 
-        List<ItemRequest> requests = itemRequestRepository.findAllOrderByCreatedAtDesc();
+        List<ItemRequest> requests = itemRequestRepository.findAllOrderByCreatedDesc();
         return ItemRequestMapper.toDtoWithItemsList(requests);
     }
 

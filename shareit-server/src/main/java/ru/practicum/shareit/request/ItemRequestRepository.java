@@ -10,12 +10,12 @@ import java.util.List;
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long>,
         QuerydslPredicateExecutor<ItemRequest> {
 
-    @Query("SELECT r FROM ItemRequest r WHERE r.user.id = :userId ORDER BY r.createdAt DESC")
-    List<ItemRequest> findAllByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+    @Query("SELECT r FROM ItemRequest r WHERE r.user.id = :userId ORDER BY r.created DESC")
+    List<ItemRequest> findAllByUserIdOrderByCreatedDesc(@Param("userId") Long userId);
 
-    @Query("SELECT r FROM ItemRequest r WHERE r.user.id != :userId ORDER BY r.createdAt DESC")
-    List<ItemRequest> findAllByUserIdNotOrderByCreatedAtDesc(@Param("userId") Long userId);
+    @Query("SELECT r FROM ItemRequest r WHERE r.user.id != :userId ORDER BY r.created DESC")
+    List<ItemRequest> findAllByUserIdNotOrderByCreatedDesc(@Param("userId") Long userId);
 
-    @Query("SELECT r FROM ItemRequest r ORDER BY r.createdAt DESC")
-    List<ItemRequest> findAllOrderByCreatedAtDesc();
+    @Query("SELECT r FROM ItemRequest r ORDER BY r.created DESC")
+    List<ItemRequest> findAllOrderByCreatedDesc();
 }

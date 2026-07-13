@@ -17,7 +17,7 @@ public class ItemRequestMapper {
         return ItemRequest.builder()
                 .description(dto.getDescription())
                 .user(user)
-                .createdAt(LocalDateTime.now())
+                .created(LocalDateTime.now())
                 .build();
     }
 
@@ -31,7 +31,7 @@ public class ItemRequestMapper {
                 .description(itemRequest.getDescription())
                 .requestorId(itemRequest.getUser() != null ? itemRequest.getUser().getId() : null)
                 .requestorName(itemRequest.getUser() != null ? itemRequest.getUser().getName() : null)
-                .createdAt(itemRequest.getCreatedAt())
+                .created(itemRequest.getCreated())
                 .build();
     }
 
@@ -58,7 +58,6 @@ public class ItemRequestMapper {
         return dto;
     }
 
-    // Метод для маппинга списка запросов
     public static List<ItemRequestDto> toDtoWithItemsList(List<ItemRequest> requests) {
         if (requests == null) {
             return null;

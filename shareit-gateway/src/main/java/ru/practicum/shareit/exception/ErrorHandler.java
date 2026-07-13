@@ -1,13 +1,17 @@
 package ru.practicum.shareit.exception;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,13 +23,14 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.warn("Ошибка валидации: {}", ex.getMessage());
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
-        return errors;
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse("Ошибка валидации");
+
+        return new ErrorResponse(errorMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -92,5 +97,29 @@ public class ErrorHandler {
     public ErrorResponse handleAllExceptions(Exception e) {
         log.error("Внутренняя ошибка сервера: ", e);
         return new ErrorResponse("Произошла внутренняя ошибка сервера");
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ErrorResponse> handleHttpClientError(HttpClientErrorException e) {
+        log.warn("Ошибка от сервера: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+
+        String responseBody = e.getResponseBodyAsString();
+        String errorMessage = "Ошибка сервера: " + e.getStatusCode();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(responseBody);
+            if (node.has("error")) {
+                errorMessage = node.get("error").asText();
+            }
+        } catch (Exception ex) {
+            if (responseBody != null && !responseBody.isEmpty()) {
+                errorMessage = responseBody;
+            }
+        }
+
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(new ErrorResponse(errorMessage));
     }
 }

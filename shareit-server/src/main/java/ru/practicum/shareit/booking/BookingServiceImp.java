@@ -60,7 +60,7 @@ public class BookingServiceImp implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponseDto approve(Long userId, Long bookingId, Boolean approved) {
+    public BookingResponseDto update(Long userId, Long bookingId, Boolean approved) {
         log.info("Подтверждение бронирования {} пользователем {}, approved={}", bookingId, userId, approved);
 
         Booking booking = checkBookingExists(bookingId);

@@ -14,26 +14,26 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> create(UserDto userDto) {
-        return post("/users", null, userDto, Object.class);  // userId = null для создания
+        return post("/users", null, userDto, Object.class);
     }
 
     public ResponseEntity<Object> update(long userId, UpdateUserDto updateUserDto) {
-        return patch("/users/{userId}", userId, updateUserDto, Object.class, userId);
+        return patch("/users/" + userId, userId, updateUserDto, Object.class, userId);
     }
 
     public ResponseEntity<Object> delete(long userId) {
-        return delete("/users/{userId}", userId, Object.class, userId);
+        return delete("/users/" + userId, userId, Object.class, userId);
     }
 
     public ResponseEntity<Object> get(long userId) {
-        return get("/users/{userId}", userId, Object.class, userId);
+        return get("/users/" + userId, userId, Object.class, userId);
     }
 
     public ResponseEntity<Object> getAll() {
-        return get("/users", null, Object.class);  // userId = null
+        return get("/users", null, Object.class);
     }
 
     public ResponseEntity<Object> getByEmail(String email) {
-        return get("/users/search?email={email}", null, Object.class, email);
+        return get("/users/search?email=" + email, null, Object.class, email);
     }
 }

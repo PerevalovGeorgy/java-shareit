@@ -32,16 +32,16 @@ public class CommentMapper {
                 .collect(Collectors.toList());
     }
 
-    public static Comment toEntity(CommentDto commentDto, Item item, User author) {
-        if (commentDto == null) {
+    public static Comment toEntity(CommentTextDto commentTextDto, Item item, User author) {
+        if (commentTextDto == null) {
             return null;
         }
 
         return Comment.builder()
-                .text(commentDto.getText())
+                .text(commentTextDto.getText())
                 .item(item)
                 .user(author)
-                .created(commentDto.getCreated() != null ? commentDto.getCreated() : LocalDateTime.now())
+                .created(LocalDateTime.now())
                 .build();
     }
 

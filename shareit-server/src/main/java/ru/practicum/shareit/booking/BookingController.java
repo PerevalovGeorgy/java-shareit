@@ -25,13 +25,13 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingResponseDto approve(
+    public BookingResponseDto update(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId,
             @RequestParam Boolean approved) {
         log.info("PATCH /bookings/{} - подтверждение бронирования пользователем {}, approved={}",
                 bookingId, userId, approved);
-        return bookingService.approve(userId, bookingId, approved);
+        return bookingService.update(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")

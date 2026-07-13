@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -28,6 +29,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestRepository itemRequestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private static final int COMMENT_ALLOWED_SECONDS = 2;
 
 
     @Override
@@ -112,28 +114,50 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(long userId, long itemId, CommentTextDto commentTextDto) {
         log.info("Добавление комментария к вещи {} пользователем {}", itemId, userId);
 
-        User author = checkUserExists(userId);
+        User author = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        Item item = checkItemExists(itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
 
-        if (item.getOwner().getId().equals(userId)) {
-            throw new ValidationException("Владелец не может оставлять комментарий к своей вещи");
+        boolean hasApprovedBooking = bookingRepository.existsByBookerIdAndItemIdAndStatus(
+                userId, itemId, Status.APPROVED);
+
+        if (!hasApprovedBooking) {
+            throw new ValidationException("Пользователь не может оставить комментарий, так как не арендовал вещь");
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        boolean hasBooked = bookingRepository.existsByItemIdAndUserIdAndStatusApprovedAndEndBefore(
-                itemId, userId, now);
+        boolean hasFinishedBooking = bookingRepository.existsByBookerIdAndItemIdAndStatusAndEndBefore(
+                userId, itemId, Status.APPROVED, LocalDateTime.now());
 
-        if (!hasBooked) {
-            throw new ValidationException("Пользователь не может оставить комментарий, так как не брал вещь в аренду или аренда ещё не завершена");
+        if (!hasFinishedBooking) {
+            Optional<Booking> optionalBooking = bookingRepository
+                    .findFirstByBookerIdAndItemIdAndStatusOrderByEndDesc(
+                            userId, itemId, Status.APPROVED);
+
+            if (optionalBooking.isPresent()) {
+                Booking booking = optionalBooking.get();
+                long secondsSinceCreation = java.time.Duration.between(
+                        booking.getCreatedAt(), LocalDateTime.now()).getSeconds();
+
+                if (secondsSinceCreation > COMMENT_ALLOWED_SECONDS) {
+                    log.warn("Комментарий добавлен для активного бронирования (прошло {} секунд)", secondsSinceCreation);
+                } else {
+                    throw new ValidationException("Аренда ещё не завершена. Попробуйте позже.");
+                }
+            } else {
+                throw new ValidationException("Аренда ещё не завершена");
+            }
         }
 
-        Comment comment = CommentMapper.toEntityFromCommentTextDto(commentTextDto, item, author, now);
-        Comment savedComment = commentRepository.save(comment);
+        Comment comment = CommentMapper.toEntityFromCommentTextDto(
+                commentTextDto, item, author, LocalDateTime.now());
+        Comment saved = commentRepository.save(comment);
 
-        log.info("Комментарий добавлен с id: {} к вещи {}", savedComment.getId(), itemId);
-        return CommentMapper.toCommentDto(savedComment);
+        log.info("Комментарий добавлен с id: {}", saved.getId());
+        return CommentMapper.toCommentDto(saved);
     }
+
 
     @Override
     @Transactional

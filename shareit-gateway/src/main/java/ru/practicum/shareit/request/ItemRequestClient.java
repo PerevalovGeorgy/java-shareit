@@ -17,6 +17,10 @@ public class ItemRequestClient extends BaseClient {
         return post("/requests", userId, itemRequestDto, Object.class);
     }
 
+    public ResponseEntity<Object> update(Long userId, Long requestId, ItemRequestDto itemRequestDto) {
+        return patch("/requests/" + requestId, userId, itemRequestDto, Object.class, requestId);
+    }
+
     public ResponseEntity<Object> getAllByUser(Long userId) {
         return get("/requests", userId, Object.class);
     }
@@ -26,10 +30,6 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getById(Long userId, Long requestId) {
-        return get("/requests/{requestId}", userId, Object.class, requestId);
-    }
-
-    public ResponseEntity<Object> update(Long userId, Long requestId, ItemRequestDto itemRequestDto) {
-        return patch("/requests/{requestId}", userId, itemRequestDto, Object.class, requestId);
+        return get("/requests/" + requestId, userId, Object.class, requestId);
     }
 }

@@ -28,7 +28,7 @@ public class ItemRequest {
     private User user;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime created;
 
     @OneToMany(mappedBy = "request", fetch = FetchType.LAZY)
     @Builder.Default

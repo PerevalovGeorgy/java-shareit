@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exception.AccessDeniedException;
+import ru.practicum.shareit.exception.BadRequestException;
 
 import java.util.List;
 
@@ -26,9 +28,15 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> update(
+            @RequestHeader(value = "X-Sharer-User-Id", required = false) Long headerUserId,
             @PathVariable long userId,
             @Valid @RequestBody UpdateUserDto updateUserDto) {
         log.info("PATCH /users/{} - обновление пользователя", userId);
+
+        if (headerUserId != null && !headerUserId.equals(userId)) {
+            throw new AccessDeniedException("Вы можете обновлять только свой профиль");
+        }
+
         return userClient.update(userId, updateUserDto);
     }
 
