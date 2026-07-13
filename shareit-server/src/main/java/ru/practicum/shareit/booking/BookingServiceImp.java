@@ -190,8 +190,4 @@ public class BookingServiceImp implements BookingService {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
     }
-
-
-
-
 }

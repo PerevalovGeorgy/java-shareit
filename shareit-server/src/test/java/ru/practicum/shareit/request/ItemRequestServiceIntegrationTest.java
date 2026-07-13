@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.ShareitServer;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -133,4 +135,86 @@ class ItemRequestServiceIntegrationTest {
         assertThat(requests.get(0).getDescription()).isEqualTo("Need a drill");
         assertThat(requests.get(1).getDescription()).isEqualTo("Need a hammer");
     }
+
+    @Test
+    void create_WhenUserNotFound_ShouldThrowNotFoundException() {
+        ItemRequestDto dto = ItemRequestDto.builder()
+                .description("Need a hammer")
+                .build();
+
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.create(999L, dto);
+        });
+    }
+
+    @Test
+    void create_WhenDescriptionIsEmpty_ShouldThrowValidationException() {
+        ItemRequestDto dto = ItemRequestDto.builder()
+                .description("")
+                .build();
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.create(user1.getId(), dto);
+        });
+    }
+
+    @Test
+    void create_WhenDescriptionIsBlank_ShouldThrowValidationException() {
+        ItemRequestDto dto = ItemRequestDto.builder()
+                .description("   ")
+                .build();
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.create(user1.getId(), dto);
+        });
+    }
+
+
+    @Test
+    void getAllByUser_WhenUserNotFound_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getAllByUser(999L);
+        });
+    }
+
+    @Test
+    void getAllByUser_WithNoRequests_ShouldReturnEmptyList() {
+        User user3 = User.builder()
+                .name("User3")
+                .email("user3@example.com")
+                .build();
+        entityManager.persist(user3);
+        entityManager.flush();
+
+        List<ItemRequestDto> requests = itemRequestService.getAllByUser(user3.getId());
+
+        assertThat(requests).isEmpty();
+    }
+
+
+    @Test
+    void getAllOtherUsers_WhenUserNotFound_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getAllOtherUsers(999L);
+        });
+    }
+
+
+
+    @Test
+    void getById_WhenUserNotFound_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getById(999L, itemRequest.getId());
+        });
+    }
+
+    @Test
+    void getById_WhenRequestNotFound_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getById(user1.getId(), 999L);
+        });
+    }
+
+
+
 }

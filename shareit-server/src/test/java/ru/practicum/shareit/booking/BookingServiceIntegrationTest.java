@@ -342,4 +342,277 @@ class BookingServiceIntegrationTest {
         assertThat(bookings).hasSize(1);
         assertThat(bookings.get(0).getItem().getId()).isEqualTo(item.getId());
     }
+    @Test
+    void create_WhenStartDateAfterEndDate_ShouldThrowValidationException() {
+        BookingRequestDto request = BookingRequestDto.builder()
+                .itemId(item.getId())
+                .start(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusDays(1))
+                .build();
+
+        assertThrows(ValidationException.class, () -> {
+            bookingService.create(booker.getId(), request);
+        });
+    }
+
+    @Test
+    void create_WhenStartDateEqualsEndDate_ShouldThrowValidationException() {
+        LocalDateTime date = LocalDateTime.now().plusDays(1);
+        BookingRequestDto request = BookingRequestDto.builder()
+                .itemId(item.getId())
+                .start(date)
+                .end(date)
+                .build();
+
+        assertThrows(ValidationException.class, () -> {
+            bookingService.create(booker.getId(), request);
+        });
+    }
+
+    @Test
+    void create_WhenBookingOverlaps_ShouldThrowBadRequestException() {
+        Booking existingBooking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(3))
+                .status(Status.APPROVED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(existingBooking);
+        entityManager.flush();
+
+        BookingRequestDto request = BookingRequestDto.builder()
+                .itemId(item.getId())
+                .start(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusDays(4))
+                .build();
+
+        assertThrows(BadRequestException.class, () -> {
+            bookingService.create(booker.getId(), request);
+        });
+    }
+
+    @Test
+    void create_WhenUserNotFound_ShouldThrowNotFoundException() {
+        BookingRequestDto request = BookingRequestDto.builder()
+                .itemId(item.getId())
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .build();
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.create(999L, request);
+        });
+    }
+
+    @Test
+    void create_WhenItemNotFound_ShouldThrowNotFoundException() {
+        BookingRequestDto request = BookingRequestDto.builder()
+                .itemId(999L)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .build();
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.create(booker.getId(), request);
+        });
+    }
+
+    @Test
+    void update_WhenBookingNotFound_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.update(owner.getId(), 999L, true);
+        });
+    }
+
+    @Test
+    void update_WhenUserNotOwner_ShouldThrowAccessDeniedException() {
+        User otherUser = User.builder()
+                .name("Other")
+                .email("other@example.com")
+                .build();
+        entityManager.persist(otherUser);
+        entityManager.flush();
+
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.WAITING)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        assertThrows(AccessDeniedException.class, () -> {
+            bookingService.update(otherUser.getId(), booking.getId(), true);
+        });
+    }
+
+    @Test
+    void update_WhenStatusNotWaiting_ShouldThrowBadRequestException() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.REJECTED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        assertThrows(BadRequestException.class, () -> {
+            bookingService.update(owner.getId(), booking.getId(), true);
+        });
+    }
+
+    @Test
+    void get_WhenBookingNotFound_ShouldThrowNotFoundException() {
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.get(booker.getId(), 999L);
+        });
+    }
+
+    @Test
+    void getAllByUser_WithRejectedState_ShouldReturnRejectedBookings() {
+        Booking booking1 = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.REJECTED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking1);
+
+        Booking booking2 = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(3))
+                .end(LocalDateTime.now().plusDays(4))
+                .status(Status.APPROVED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking2);
+
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByUser(booker.getId(), "REJECTED");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.REJECTED);
+    }
+
+    @Test
+    void getAllByUser_WithCanceledState_ShouldReturnCanceledBookings() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.CANCELED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByUser(booker.getId(), "CANCELED");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.CANCELED);
+    }
+
+    @Test
+    void getAllByOwner_WithNoItems_ShouldThrowBadRequestException() {
+        User userWithoutItems = User.builder()
+                .name("No Items User")
+                .email("noitems@example.com")
+                .build();
+        entityManager.persist(userWithoutItems);
+        entityManager.flush();
+
+        assertThrows(BadRequestException.class, () -> {
+            bookingService.getAllByOwner(userWithoutItems.getId(), "ALL");
+        });
+    }
+
+    @Test
+    void getAllByOwner_WithWaitingState_ShouldReturnWaitingBookings() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.WAITING)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByOwner(owner.getId(), "WAITING");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.WAITING);
+    }
+
+    @Test
+    void getAllByOwner_WithApprovedState_ShouldReturnApprovedBookings() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.APPROVED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByOwner(owner.getId(), "APPROVED");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.APPROVED);
+    }
+
+    @Test
+    void getAllByOwner_WithRejectedState_ShouldReturnRejectedBookings() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.REJECTED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByOwner(owner.getId(), "REJECTED");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.REJECTED);
+    }
+
+    @Test
+    void getAllByOwner_WithCanceledState_ShouldReturnCanceledBookings() {
+        Booking booking = Booking.builder()
+                .item(item)
+                .booker(booker)
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(Status.CANCELED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        entityManager.persist(booking);
+        entityManager.flush();
+
+        List<BookingResponseDto> bookings = bookingService.getAllByOwner(owner.getId(), "CANCELED");
+
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings.get(0).getStatus()).isEqualTo(Status.CANCELED);
+    }
 }
