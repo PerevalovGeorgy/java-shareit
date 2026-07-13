@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request;
 
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.request.ItemResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

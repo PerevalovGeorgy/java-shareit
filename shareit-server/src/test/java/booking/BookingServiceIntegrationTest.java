@@ -10,10 +10,8 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemServiceImpl;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
