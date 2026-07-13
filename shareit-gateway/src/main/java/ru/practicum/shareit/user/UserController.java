@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.AccessDeniedException;
-import ru.practicum.shareit.exception.BadRequestException;
 
-import java.util.List;
 
 @Slf4j
 @RestController
