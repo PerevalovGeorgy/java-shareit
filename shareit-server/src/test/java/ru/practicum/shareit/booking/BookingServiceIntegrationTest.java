@@ -342,6 +342,7 @@ class BookingServiceIntegrationTest {
         assertThat(bookings).hasSize(1);
         assertThat(bookings.get(0).getItem().getId()).isEqualTo(item.getId());
     }
+
     @Test
     void create_WhenStartDateAfterEndDate_ShouldThrowValidationException() {
         BookingRequestDto request = BookingRequestDto.builder()
