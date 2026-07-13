@@ -42,6 +42,7 @@ class UserControllerTest {
                 .email("test@example.com")
                 .build();
 
+
         updateUserDto = UpdateUserDto.builder()
                 .name("Updated User")
                 .email("updated@example.com")
