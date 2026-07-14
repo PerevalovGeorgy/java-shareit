@@ -520,7 +520,6 @@ class BookingServiceIntegrationTest {
                 .build();
         entityManager.persist(booking);
         entityManager.flush();
-
         List<BookingResponseDto> bookings = bookingService.getAllByUser(booker.getId(), "CANCELED");
 
         assertThat(bookings).hasSize(1);
