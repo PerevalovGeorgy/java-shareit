@@ -79,17 +79,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toDtoWithItemsList(requests);
     }
 
-
-
-
-
-
-
-
-
-
-
-
     private User checkUserExists(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
